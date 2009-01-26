@@ -44,7 +44,7 @@ public:
     void OnViewY(wxCommandEvent& event);
     void OnViewCentre(wxCommandEvent& event);
     void OnActors(wxCommandEvent& event);
-    void OnUpdateActors(wxCommandEvent& event);
+    void OnUpdateActors(wxMenuEvent& event);
     void OnAnimate(wxCommandEvent& event);
     void OnUpdateAnimate(wxCommandEvent& event);
     void UpdateAnimate();

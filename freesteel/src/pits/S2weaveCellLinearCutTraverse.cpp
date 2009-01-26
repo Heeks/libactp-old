@@ -140,7 +140,8 @@ bool S2weaveCellLinearCutTraverse::SetCellCutContinue(const P2& lvbearing)
 		// we should see it in the list of crossings and move on.  
 		else
 		{
-			for (int libb = 0; libb < bolistcrossings.size(); libb++) 
+			int libb = 0;
+			for (; libb < bolistcrossings.size(); libb++) 
 				if (ib == bolistcrossings[libb].first) 
 					break; 
 			ASSERT(libb < bolistcrossings.size()); 

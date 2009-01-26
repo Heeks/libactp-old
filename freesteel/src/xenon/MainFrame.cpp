@@ -495,7 +495,7 @@ void MainFrame::UpdateActors()
         }
 }
 
-void MainFrame::OnUpdateActors(wxCommandEvent& event)
+void MainFrame::OnUpdateActors(wxMenuEvent& event)
 {
 	UpdateActors();
 }
