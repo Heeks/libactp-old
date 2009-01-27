@@ -96,7 +96,8 @@ public:
 	// they are erased after the components have been built.  
 	vector<P3> lvd; 
 	vector<int> ltd; 
-	void PushTriangle(const P3& p0, const P3& p1, const P3& p2); 
+	void PushTriangle(const P3& p0, const P3& p1, const P3& p2);
+	void ReadStlFile(const char* filepath);
 
 	// vectors components
 	vector<P3> vdX;  

@@ -26,7 +26,7 @@
 //////////////////////////////////////////////////////////////////////
 int FindCellParal(const vector<S1>& wfibs, double lw) 
 {
-	int res; 
+	unsigned int res; 
 	for (res = 1; res < wfibs.size(); res++) 
 		if (wfibs[res].wp > lw) 
 			break; 
@@ -143,7 +143,7 @@ int S2weaveCell::GetBoundListPosition(int sic, const P2& ptb, bool bOnBoundOutsi
 {
 	if (boundlist.empty()) 
 		return -1; 
-	int res = 0; 
+	unsigned int res = 0; 
 	bool bgoingup = ((sic & 2) == 0); 
 	bool binV = ((sic & 1) == 0); 
 
@@ -265,7 +265,7 @@ int S2weaveCell::CreateBoundList()
 	// (not as likely if there has been a flat-rad offset where the region will always have some radius, but the spaces may be narrow).  
 	DEBUG_ONLY(bool binD = bLDin); 
 	int ib = boundlist.size() - 1; 
-	for (int ibl = 0; ibl < boundlist.size(); ibl++) 
+	for (unsigned int ibl = 0; ibl < boundlist.size(); ibl++) 
 	{
 		ASSERT(binD == !GetBoundLower(ibl)); 
 		if (GetBoundLower(ibl)) 

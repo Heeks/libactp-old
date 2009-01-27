@@ -25,7 +25,7 @@
 //////////////////////////////////////////////////////////////////////
 void S2weaveCellLinearCutTraverse::Findibbfore(int libb) 
 {
-	for (ibb = libb; ibb < bolistcrossings.size(); ibb++) 
+	for (ibb = libb; ibb < (int)bolistcrossings.size(); ibb++) 
 	{
 		if (!bolistcrossings[ibb].second) 
 		{
@@ -141,7 +141,7 @@ bool S2weaveCellLinearCutTraverse::SetCellCutContinue(const P2& lvbearing)
 		else
 		{
 			int libb = 0;
-			for (; libb < bolistcrossings.size(); libb++) 
+			for (; libb < (int)(bolistcrossings.size()); libb++) 
 				if (ib == bolistcrossings[libb].first) 
 					break; 
 			ASSERT(libb < bolistcrossings.size()); 
@@ -291,14 +291,14 @@ void S2weaveCellLinearCutTraverse::AdvanceAlongContourAcrossCell()
 	AdvanceCrossSide(sicc, ptcpbb); 
 
 	// find the point in the boundlist which matches the one we are crossing over on.  
-	for (ibl = 0; ibl < boundlist.size(); ibl++) 
+	for (ibl = 0; ibl < (int)(boundlist.size()); ibl++) 
 		if (boundlist[ibl].second == blcp) 
 			break; 
 	ASSERT(ibl < boundlist.size()); 
 	ASSERT(boundlist[ibl].first == ((sicc + 2) & 3)); 
 
 	// find the pair which leads on from this point 
-	for (ib = 0; ib < bolistpairs.size(); ib++) 
+	for (ib = 0; ib < (int)(bolistpairs.size()); ib++) 
 		if (bolistpairs[ib].first == ibl) 
 			break; 
 	ASSERT(ib < bolistpairs.size()); 

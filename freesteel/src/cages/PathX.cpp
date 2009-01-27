@@ -38,7 +38,7 @@ void Ray_gen2::ReleaseFibre()
 	{
 		sort(scuts.begin(), scuts.end()); 
 		ASSERT((scuts.size() % 2) == 0); 
-		for (int i = 1; i < scuts.size(); i += 2) 
+		for (unsigned int i = 1; i < scuts.size(); i += 2) 
 		{
 			ASSERT(scuts[i - 1].blower && !scuts[i].blower); 
 			pfib->Merge(scuts[i - 1].w, true, scuts[i].w, true); 
@@ -170,12 +170,12 @@ void HackAreaOffset(Ray_gen2& rgen2, const PathXSeries paths)
 	int j = 0;
 	P2 tb; 
 	bool bFirstPoint = true; 
-	for (int i = 0; i < paths.pths.size(); i++) 
+	for (int i = 0; i < (int)(paths.pths.size()); i++) 
 	{
 		P2 ta = tb; 
 		tb = rgen2.Transform(paths.pths[i]); 
 
-		if ((j == paths.brks.size()) || (i < paths.brks[j]))
+		if ((j == (int)(paths.brks.size())) || (i < paths.brks[j]))
 		{
 			if (!bFirstPoint) 
 			{
@@ -192,7 +192,7 @@ void HackAreaOffset(Ray_gen2& rgen2, const PathXSeries paths)
 			ASSERT(i == paths.brks[j]); 
 			do
 				j++;
-			while ((j < paths.brks.size()) && (i == paths.brks[j])); 
+			while ((j < (int)(paths.brks.size())) && (i == paths.brks[j])); 
 
 			bFirstPoint = true; 
 		}
@@ -246,13 +246,13 @@ void HackToolpath(Ray_gen2& rgen2, const PathXSeries& pathxs, int iseg, const P2
 			ASSERT(i == pathxs.brks[j]); 
 			do
 				j++;
-			while ((j < pathxs.brks.size()) && (i == pathxs.brks[j])); 
+			while ((j < (int)(pathxs.brks.size())) && (i == pathxs.brks[j])); 
 
 			bFirstPoint = true; 
 		}
 	}
 	
-	if (iseg < pathxs.pths.size())
+	if (iseg < (int)(pathxs.pths.size()))
 	{
 		ASSERT(!bFirstPoint);
 		P2 ta = tb;

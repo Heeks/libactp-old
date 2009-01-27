@@ -22,6 +22,7 @@
 #include "bolts/bolts.h"
 #include "cages/cages.h"
 
+#include <fstream>
 
 
 //////////////////////////////////////////////////////////////////////
@@ -67,6 +68,87 @@ void SurfX::PushTriangle(const P3& p0, const P3& p1, const P3& p2)
 	lvd.push_back(p2); 
 }; 
 
+void SurfX::ReadStlFile(const char* filepath)
+{
+	// read the stl file
+	ifstream ifs(filepath, ios::binary);
+	if(!ifs)return;
+
+	char solid_string[6] = "aaaaa";
+	ifs.read(solid_string, 5);
+	if(ifs.eof())return;
+	if(strcmp(solid_string, "solid"))
+	{
+		// try binary file read
+
+		// read the header
+		char header[81];
+		header[80] = 0;
+		memcpy(header, solid_string, 5);
+		ifs.read(&header[5], 75);
+
+		unsigned int num_facets = 0;
+		ifs.read((char*)(&num_facets), 4);
+
+		float n[3];
+		float x[3][3];
+
+		for(unsigned int i = 0; i<num_facets; i++)
+		{
+			ifs.read((char*)(n), 12);
+			ifs.read((char*)(x[0]), 36);
+			short attr;
+			ifs.read((char*)(&attr), 2);
+			PushTriangle(P3(x[0][0], x[0][1], x[0][2]), P3(x[1][0], x[1][1], x[1][2]), P3(x[2][0], x[2][1], x[2][2]));
+		}
+	}
+	else
+	{
+		// "solid" already found
+		char str[1024] = "solid";
+		ifs.getline(&str[5], 1024);
+
+		float n[3];
+		float x[3][3];
+		char five_chars[6] = "aaaaa";
+
+		int vertex = 0;
+
+		while(!ifs.eof())
+		{
+			ifs.getline(str, 1024);
+
+			int i = 0, j = 0;
+			for(; i<5; i++, j++)
+			{
+				if(str[j] == 0)break;
+				while(str[j] == ' ' || str[j] == '\t')j++;
+				five_chars[i] = str[j];
+			}
+			if(i == 5)
+			{
+				if(!strcmp(five_chars, "verte"))
+				{
+					sscanf(str, " vertex %f %f %f", &(x[vertex][0]), &(x[vertex][1]), &(x[vertex][2]));
+					vertex++;
+					if(vertex > 2)vertex = 2;
+				}
+				else if(!strcmp(five_chars, "facet"))
+				{
+					sscanf(str, " facet normal %f %f %f", &(n[0]), &(n[1]), &(n[2]));
+					vertex = 0;
+				}
+				else if(!strcmp(five_chars, "endfa"))
+				{
+					if(vertex == 2)
+					{
+						PushTriangle(P3(x[0][0], x[0][1], x[0][2]), P3(x[1][0], x[1][1], x[1][2]), P3(x[2][0], x[2][1], x[2][2]));
+					}
+				}
+			}
+		}
+	}
+}
 
 //////////////////////////////////////////////////////////////////////
 struct p3X_order

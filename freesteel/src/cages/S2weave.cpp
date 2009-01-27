@@ -155,25 +155,25 @@ int& S2weave::ContourNumber(S2weaveB1iter& al)
 //////////////////////////////////////////////////////////////////////
 void S1::SetAllCutCodes(int lcutcode) 
 {
-	for (int i = 0; i < size(); i++) 
+	for (unsigned int i = 0; i < size(); i++) 
 		operator[](i).cutcode = lcutcode; 
 }
 
 //////////////////////////////////////////////////////////////////////
 void S2weave::SetAllCutCodes(int lcutcode)  
 {
-	for (int iu = 0; iu < ufibs.size(); iu++) 
+	for (unsigned int iu = 0; iu < ufibs.size(); iu++) 
 		ufibs[iu].SetAllCutCodes(lcutcode); 
-	for (int iv = 0; iv < vfibs.size(); iv++) 
+	for (unsigned int iv = 0; iv < vfibs.size(); iv++) 
 		vfibs[iv].SetAllCutCodes(lcutcode); 
 }
 
 void S2weave::Invert()
 {
-    for (int iu = 0; iu < ufibs.size(); iu++)
+    for (unsigned int iu = 0; iu < ufibs.size(); iu++)
         ufibs[iu].Invert();
 
-    for (int iv = 0; iv < vfibs.size(); iv++)
+    for (unsigned int iv = 0; iv < vfibs.size(); iv++)
         vfibs[iv].Invert();
 }
 

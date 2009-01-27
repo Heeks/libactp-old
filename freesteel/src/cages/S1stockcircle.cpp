@@ -46,7 +46,7 @@ void CircCrossingStructure::ChopOutBoundary(const vector<P2>& bound)
 	bool bradfirstin = (rad1sq < cradsq); 
 	bool brad1in = bradfirstin; 
 
-	for (int i = 1; i < bound.size(); i++) 
+	for (unsigned int i = 1; i < bound.size(); i++) 
 	{
 		// move to next point in contour.  (done here due to the continue commands).  
 		P2 p0 = p1; 
@@ -205,7 +205,7 @@ void CircCrossingStructure::ChopOutBoundary(const vector<P2>& bound)
 		ASSERT(hrayinvaldist >= 0.0); 
 
 	// middle segments 
-	while (kcp < cpara.size()) 
+	while (kcp < (int)(cpara.size())) 
 	{
 		ASSERT(!cpara[kcp - 1].bClockwiseIn); 
 		ASSERT(cpara[kcp].bClockwiseIn); 
@@ -526,7 +526,7 @@ void CircCrossingStructure::HackToolRectangle(const P2& p0, const P2& p1)
 		circrange.Minus(I1(0.0, cpara.front().darg)); 
 		k++; 
 	}
-	while (k < cpara.size()) 
+	while (k < (int)(cpara.size())) 
 	{
 		ASSERT(cpara[k].bClockwiseIn && !cpara[k - 1].bClockwiseIn); 
 		circrange.Minus(I1(cpara[k - 1].darg, cpara[k].darg)); 
@@ -548,7 +548,7 @@ void HackCCSx(CircCrossingStructure& ccs, const PathXSeries& paths)
 	// leaving out the toolcircle for the first point.  
 	int j = 0;
 	P2 p1 = paths.pths[0] - ccs.cpt; 
-	for (int i = 1; i < paths.pths.size(); i++) 
+	for (int i = 1; i < (int)(paths.pths.size()); i++) 
 	{
 		// is our area full?  
 		if (ccs.circrange.empty()) 
@@ -566,7 +566,7 @@ void HackCCSx(CircCrossingStructure& ccs, const PathXSeries& paths)
 			ASSERT(i == paths.brks[j]); 
 			do
 				j++;
-			while ((j < paths.brks.size()) && (i == paths.brks[j])); 
+			while ((j < (int)(paths.brks.size())) && (i == paths.brks[j])); 
 		}
 		
 		ccs.HackToolCircle(p1); 
@@ -594,7 +594,7 @@ void HackCCSx(CircCrossingStructure& ccs, const PathXboxed& pathxb)
 	for (int iu = iurg.first; iu <= iurg.second; iu++) 
 	{
 		const pucketX& pucx = pathxb.puckets[iu]; 
-		for (int k = 0; k < pucx.cklines.size(); k++) 
+		for (int k = 0; k < (int)(pucx.cklines.size()); k++) 
 		{
 			if ((pucx.cklines[k].idup != -1) || (pucx.cklines[k].idup != pathxb.maxidup))
 			{
@@ -637,7 +637,7 @@ void CircleIntersectNew(vector<I1>& res, const P2& cpt, double crad, const PathX
 	if (ccs.circrange.empty()) 
 		ASSERT(1); 
 
-	for (int i = 1; i < ccs.circrange.size(); i += 2) 
+	for (int i = 1; i < (int)(ccs.circrange.size()); i += 2) 
 		res.push_back(I1(ccs.circrange[i - 1].w, ccs.circrange[i].w)); 
 }
 
