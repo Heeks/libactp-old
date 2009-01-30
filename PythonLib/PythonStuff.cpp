@@ -78,6 +78,8 @@ static void MakeRectBoundary(SurfX &sx, vector<PathXSeries> &boundary_ftpaths)
 	boundary_ftpaths.back().Break(); 
 }
 
+static vector<PathXSeries> toolpath_ftpaths;
+
 static int test_roughing(const char* filepath = NULL)
 {
 	double cr = 3.0; // corner radius
@@ -117,12 +119,9 @@ static int test_roughing(const char* filepath = NULL)
 		params.fretract = 5000;
 		params.thintol = 0.0001;
 
+		// clear the toolpath
+		toolpath_ftpaths.clear();
 
-
-		//GSTtoolpath* gsttpath = new GSTtoolpath;
-		//gst->gstees.push_back(gsttpath);
-		vector<PathXSeries> toolpath_ftpaths;
-		
 		// define the surface
 		SurfX sx;
 		if(filepath)
@@ -142,31 +141,6 @@ static int test_roughing(const char* filepath = NULL)
 
 		// make the roughing toolpath
 		MakeCorerough(toolpath_ftpaths, sx, boundary_ftpaths[0], params);
-
-		// print them
-		for(vector<PathXSeries>::iterator It = toolpath_ftpaths.begin(); It != toolpath_ftpaths.end(); It++)
-		{
-			PathXSeries &ps = *It;
-			cout<<"PathXSeries z = "<<ps.z<<"\n";
-			for(vector<P2>::iterator It2 = ps.pths.begin(); It2 != ps.pths.end(); It2++)
-			{
-				P2 &p2 = *It2;
-				cout<<"X"<<p2.u<<"Y"<<p2.v<<" ";
-			}
-			cout<<"end PathXSeries\n";
-		}
-
-		// write result to a file
-		//FILE* fpost = fopen("freesteel.tp", "w");
-		//ASSERT(fpost);
-		//PostProcess(fpost, toolpath_ftpaths, params);
-		//fclose(fpost);
-
-
-		//gsttpath->toolshape = ToolShape(params.toolflatrad, params.toolcornerrad, params.toolcornerrad, params.toolcornerrad / 10.0);
-		//gsttpath->bound.Append(boundary_ftpaths[0].pths);
-		//gsttpath->UpdateFromPax();
-		//gsttpath->AddToRenderer(&gst->ren1);
 	}
 
 	return 0; // success
@@ -195,9 +169,166 @@ static PyObject* actp_makerough(PyObject* self, PyObject* args)
 	return pValue;
 }
 
+static PyObject* actp_getnumpaths(PyObject* self, PyObject* args)
+{
+	PyObject *pValue = PyInt_FromLong(toolpath_ftpaths.size());
+	Py_INCREF(pValue);
+	return pValue;
+}
+
+static PyObject* actp_getnumpoints(PyObject* self, PyObject* args)
+{
+	int path_index;
+	if (!PyArg_ParseTuple(args, "i", &path_index)) return NULL;
+
+	PathXSeries& path = toolpath_ftpaths[path_index];
+
+	PyObject *pValue = PyInt_FromLong(path.pths.size());
+	Py_INCREF(pValue);
+	return pValue;
+}
+
+static PyObject* actp_getz(PyObject* self, PyObject* args)
+{
+	int path_index;
+	if (!PyArg_ParseTuple(args, "i", &path_index)) return NULL;
+
+	PathXSeries& path = toolpath_ftpaths[path_index];
+
+	PyObject *pValue = PyFloat_FromDouble(path.z);
+	Py_INCREF(pValue);
+	return pValue;
+}
+
+static PyObject* actp_getpoint(PyObject* self, PyObject* args)
+{
+	int path_index, point_index;
+	if (!PyArg_ParseTuple(args, "ii", &path_index, &point_index)) return NULL;
+
+	PathXSeries& path = toolpath_ftpaths[path_index];
+	P2& point = path.pths[point_index];
+
+
+	// return point a tuple ( x, y )
+	PyObject *pTuple = PyTuple_New(2);
+	{
+		PyObject *pValue = PyFloat_FromDouble(point.u);
+		if (!pValue){
+			Py_DECREF(pTuple);return NULL;
+		}
+		PyTuple_SetItem(pTuple, 0, pValue);
+	}
+	{
+		PyObject *pValue = PyFloat_FromDouble(point.v);
+		if (!pValue){
+			Py_DECREF(pTuple);return NULL;
+		}
+		PyTuple_SetItem(pTuple, 1, pValue);
+	}
+
+	Py_INCREF(pTuple);
+	return pTuple;
+}
+
+static PyObject* actp_getnumbreaks(PyObject* self, PyObject* args)
+{
+	int path_index;
+	if (!PyArg_ParseTuple(args, "i", &path_index)) return NULL;
+
+	PathXSeries& path = toolpath_ftpaths[path_index];
+
+	PyObject *pValue = PyInt_FromLong(path.brks.size());
+	Py_INCREF(pValue);
+	return pValue;
+}
+
+static PyObject* actp_getbreak(PyObject* self, PyObject* args)
+{
+	int path_index, break_index;
+	if (!PyArg_ParseTuple(args, "ii", &path_index, &break_index)) return NULL;
+
+	PathXSeries& path = toolpath_ftpaths[path_index];
+	int brk = path.brks[break_index];
+
+	PyObject *pValue = PyInt_FromLong(brk);
+	Py_INCREF(pValue);
+	return pValue;
+}
+
+static PyObject* actp_getnumlinkpths(PyObject* self, PyObject* args)
+{
+	int path_index;
+	if (!PyArg_ParseTuple(args, "i", &path_index)) return NULL;
+
+	PathXSeries& path = toolpath_ftpaths[path_index];
+
+	PyObject *pValue = PyInt_FromLong(path.linkpths.size());
+	Py_INCREF(pValue);
+	return pValue;
+}
+
+static PyObject* actp_getnumlinkpoints(PyObject* self, PyObject* args)
+{
+	int path_index, link_index;
+	if (!PyArg_ParseTuple(args, "ii", &path_index, &link_index)) return NULL;
+
+	PathXSeries& path = toolpath_ftpaths[path_index];
+	vector<P3> &link_path = path.linkpths[link_index];
+
+	PyObject *pValue = PyInt_FromLong(link_path.size());
+	Py_INCREF(pValue);
+	return pValue;
+}
+
+static PyObject* actp_getlinkpoint(PyObject* self, PyObject* args)
+{
+	int path_index, link_index, point_index;
+	if (!PyArg_ParseTuple(args, "iii", &path_index, &link_index, &point_index)) return NULL;
+
+	PathXSeries& path = toolpath_ftpaths[path_index];
+	vector<P3> &link_path = path.linkpths[link_index];
+	P3 &point = link_path[point_index];
+
+	// return point a tuple ( x, y, z )
+	PyObject *pTuple = PyTuple_New(3);
+	{
+		PyObject *pValue = PyFloat_FromDouble(point.x);
+		if (!pValue){
+			Py_DECREF(pTuple);return NULL;
+		}
+		PyTuple_SetItem(pTuple, 0, pValue);
+	}
+	{
+		PyObject *pValue = PyFloat_FromDouble(point.y);
+		if (!pValue){
+			Py_DECREF(pTuple);return NULL;
+		}
+		PyTuple_SetItem(pTuple, 1, pValue);
+	}
+	{
+		PyObject *pValue = PyFloat_FromDouble(point.z);
+		if (!pValue){
+			Py_DECREF(pTuple);return NULL;
+		}
+		PyTuple_SetItem(pTuple, 2, pValue);
+	}
+
+	Py_INCREF(pTuple);
+	return pTuple;
+}
+
 static PyMethodDef ActpMethods[] = {
 	{"test", actp_test, METH_VARARGS , ""},
 	{"makerough", actp_makerough, METH_VARARGS , ""},
+	{"getnumpaths", actp_getnumpaths, METH_VARARGS , ""},
+	{"getnumpoints", actp_getnumpoints, METH_VARARGS , ""},
+	{"getz", actp_getz, METH_VARARGS , ""},
+	{"getpoint", actp_getpoint, METH_VARARGS , ""},
+	{"getnumbreaks", actp_getnumbreaks, METH_VARARGS , ""},
+	{"getbreak", actp_getbreak, METH_VARARGS , ""},
+	{"getnumlinkpths", actp_getnumlinkpths, METH_VARARGS , ""},
+	{"getnumlinkpoints", actp_getnumlinkpoints, METH_VARARGS , ""},
+	{"getlinkpoint", actp_getlinkpoint, METH_VARARGS , ""},
 	{NULL, NULL, 0, NULL}
 };
 
