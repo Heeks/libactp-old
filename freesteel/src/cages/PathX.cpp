@@ -232,7 +232,7 @@ void HackToolpath(Ray_gen2& rgen2, const PathXSeries& pathxs, int iseg, const P2
 		P2 ta = tb; 
 		tb = rgen2.Transform(pathxs.pths[i]); 
 
-		if ((j == pathxs.brks.size()) || (i < pathxs.brks[j]))
+		if ((j == (int)(pathxs.brks.size())) || (i < pathxs.brks[j]))
 		{
 			if (!bFirstPoint) 
 				rgen2.DiscSliceCapN(ta, tb); 

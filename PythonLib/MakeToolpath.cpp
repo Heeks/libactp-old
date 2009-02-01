@@ -215,7 +215,7 @@ void BuildLinkZ(vector<P3>& lnkpth, const vector<P2>& lnk2D, double z, const Mac
 	// total length
 	double totallen = 0;
 	int ix = 1;
-	while (ix < lnk2D.size())
+	while (ix < (int)(lnk2D.size()))
 	{
 		totallen += (lnk2D[ix] - lnk2D[ix - 1]).Len();
 		++ix;
@@ -229,7 +229,7 @@ void BuildLinkZ(vector<P3>& lnkpth, const vector<P2>& lnk2D, double z, const Mac
 	int ixstart = 1;
 	double len = 0;
 	lnkStart.push_back(ConvertGZ(lnk2D[0], z));
-	while (ixstart < lnk2D.size())
+	while (ixstart < (int)(lnk2D.size()))
 	{
 		len += (lnk2D[ixstart] - lnk2D[ixstart - 1]).Len();
 		if (len > leadofflen)
@@ -240,7 +240,7 @@ void BuildLinkZ(vector<P3>& lnkpth, const vector<P2>& lnk2D, double z, const Mac
 		++ixstart;
 	}
 	ASSERT((lnkStart.back().z > z) && (lnkStart.back().z <= params.leadoffdz + z));
-	if (ixstart < lnk2D.size())
+	if (ixstart < (int)(lnk2D.size()))
 	{
 		len += (lnk2D[ixstart] - lnk2D[ixstart - 1]).Len();
 		double dz = len * params.leadoffdz / leadofflen;
@@ -293,13 +293,13 @@ int CoreRoughGeneration::TrackLink(const vector<P2>& lnk2D, S2weaveCellLinearCut
 {
 	bool bOnStock = false;
 	int ix = bFromEnd ? (lnk2D.size() - 2) : 1;
-	for (; (bFromEnd ? (ix > 0) : (ix < lnk2D.size() - 1)); ix += (bFromEnd ? -1 : 1))
+	for (; (bFromEnd ? (ix > 0) : (ix < (int)(lnk2D.size()) - 1)); ix += (bFromEnd ? -1 : 1))
 	{
 //		TOL_ZERO((lnk2D[bFromEnd ? (ix) : (ix - 1)] - wclink.ptcp).Len());
 		P2 Nvbearing = bFromEnd ? (lnk2D[ix - 1] - lnk2D[ix]) : (lnk2D[ix] - lnk2D[ix - 1]); 
-		double Nvd = Nvbearing.Len(); 
+		//double Nvd = Nvbearing.Len();  // unused variable
 
-		double lNvd = wclink.FollowBearing(Nvbearing / Nvd, Nvd); 
+		//double lNvd = wclink.FollowBearing(Nvbearing / Nvd, Nvd); // unsued variable
 		if (wclink.bOnContour)
 			return (bFromEnd ? ix - 1 : ix); 
 		else
@@ -497,7 +497,7 @@ void CoreRoughGeneration::GrabberAlg(const MachineParams& params)
 			{
 				double z = pathxb.ppathx->z + params.leadoffdz;
 				double zstep = params.leadoffsamplestep * params.leadoffdz / params.leadofflen;
-				for (int ie = 0; ie < curlin.size() - 1; ++ie)
+				for (int ie = 0; ie < (int)(curlin.size()) - 1; ++ie)
 				{
 					lnkpth.push_back(ConvertGZ(curlin[ie], z));
 					z -= zstep;

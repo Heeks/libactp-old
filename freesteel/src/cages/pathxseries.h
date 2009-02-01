@@ -62,7 +62,7 @@ public:
 
 	void Pop_back()
 	{
-		if (brks.empty() || (pths.size() != brks.back()))
+		if (brks.empty() || ((int)(pths.size()) != brks.back()))
 			pths.pop_back();
 	}
 

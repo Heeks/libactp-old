@@ -141,7 +141,7 @@ void PathXboxed::PutSegment(int iseg, bool bFirst, bool bRemove)
 void PathXboxed::Add(const P2& p1) 
 {
 	// if this is the starting point then nothing to do.  
-	bool bFirst = (ppathx->pths.empty() || (!ppathx->brks.empty() && (ppathx->brks.back() == ppathx->pths.size()))); 
+	bool bFirst = (ppathx->pths.empty() || (!ppathx->brks.empty() && (ppathx->brks.back() == (int)(ppathx->pths.size())))); 
 	ppathx->pths.push_back(p1); 
 	PutSegment(ppathx->pths.size() - 1, bFirst, false);  
 }

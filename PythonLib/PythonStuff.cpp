@@ -85,7 +85,10 @@ static int test_roughing(const char* filepath = NULL)
 	double cr = 3.0; // corner radius
 	double fr = 0.0; // flat radius
 	double sd = 5.0;// step down
-	double si = cr / 2.0;// step in
+
+	// unused for now
+        //double si = cr / 2.0;// step in
+
 	//if (RunCoreRoughDlg(cr, fr, sd, si))
 	{
 		MachineParams params;

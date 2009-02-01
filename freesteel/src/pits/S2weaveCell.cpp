@@ -93,7 +93,7 @@ const S1* S2weaveCell::GetSide(int icn) const
 // for now we assume it's all a regular grid.  
 void S2weaveCell::AdvanceCrossSide(int icn, const P2& cspt)  
 {
-	double wvval = ((icn & 1) == 0 ? cspt.v : cspt.u); 
+	//double wvval = ((icn & 1) == 0 ? cspt.v : cspt.u); // unused variable
 	#ifdef MDEBUG
 		double mvval = ((icn & 1) != 0 ? cspt.v : cspt.u); 
 	#endif
@@ -223,7 +223,7 @@ bool AddBoundListMatches(vector< pair<int, B1*> >& boundlist, const S1& fw, cons
     ASSERT(fw.empty() || fw.front().blower);
     ASSERT(fw.empty() || !fw.back().blower);
     bool bLeftIn = (ilr.first == 0 ? false : fw[ilr.first - 1].blower);
-    bool bRightIn = (ilr.second == fw.size() - 1 ? false : !fw[ilr.second + 1].blower);
+    bool bRightIn = (ilr.second == (int)(fw.size()) - 1 ? false : !fw[ilr.second + 1].blower);
     ASSERT(bStartIn == (bGoingDown ? bRightIn : bLeftIn));
     bool bEndIn = (bGoingDown ? bLeftIn : bRightIn);
 

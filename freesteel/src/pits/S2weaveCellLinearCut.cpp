@@ -295,7 +295,7 @@ void S2weaveCellLinearCut::FindBolistCrossings()
 
 		// advance to next boundlist element.  
 		ib++; 
-		if (ib == boundlist.size()) 
+		if (ib == (int)(boundlist.size())) 
 			ib = 0; 
 	}
 

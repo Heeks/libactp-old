@@ -22,7 +22,9 @@
 #ifndef macros__h
 #define macros__h
 
+#ifdef WIN32
 #pragma warning(disable:4390) // Empty statements in code - caused by ASSERT statements in release
+#endif
 
 //////////////////////////////////////////////////////////////////////
 //#define MDEBUG 1

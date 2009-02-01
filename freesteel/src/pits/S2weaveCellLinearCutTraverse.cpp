@@ -42,7 +42,7 @@ void S2weaveCellLinearCutTraverse::Findibbfore(int libb)
 		}
 		#endif
 	}
-	if (ibb == bolistcrossings.size()) 
+	if (ibb == (int)(bolistcrossings.size())) 
 		ibb = -1; 
 }
 
@@ -94,7 +94,7 @@ bool S2weaveCellLinearCutTraverse::SetCellCutContinue(const P2& lvbearing)
 	// boundary, because it's on it already.  
 	bool bOnBoundB = false; 
 	bool bOnBoundF = false; 
-	int pib = ib; 
+	//int pib = ib; // unused variable
 	if (bOnContour && EqualOr(lambb, 0.0, 1.0))  
 	{
 		// the going out case is then we we are on the bound on the 
@@ -338,7 +338,7 @@ bool S2weaveCellLinearCutTraverse::OnContourFollowBearing(double dch, double fol
 	}
 	else
 	{
-		double res = (1.0 - lambb) * clen; 
+		// double res = (1.0 - lambb) * clen;  // unused variable
 		ASSERT(res <= folldist); 
 
 		// we will cross this cell boundary.  Mark it if it's entirely cleared from the start.  

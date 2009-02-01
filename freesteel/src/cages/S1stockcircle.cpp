@@ -557,7 +557,7 @@ void HackCCSx(CircCrossingStructure& ccs, const PathXSeries& paths)
 		P2 p0 = p1; 
 		p1 = paths.pths[i] - ccs.cpt; 
 
-		if ((j == paths.brks.size()) || (i < paths.brks[j]))
+		if ((j == (int)(paths.brks.size())) || (i < paths.brks[j]))
 			ccs.HackToolRectangle(p0, p1); 
 
 		// advance through possible multiple markings on this segment.  
