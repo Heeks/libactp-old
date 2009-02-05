@@ -4,7 +4,7 @@
 #include "windows.h"
 #endif
 
-#include "MakeToolpath.h"
+#include "pits/CoreRoughGeneration.h"
 
 #if _DEBUG
 #undef _DEBUG
@@ -39,124 +39,43 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 
 #endif
 
-static void PushTestTrianglesIntoSurface(SurfX& sx) 
-{
-	P3 p0(0.0, 0.0, 0.0); 
-	P3 p1(20.0, 0.0, 0.0); 
-	P3 p2(7.0, 7.0, 4.0); 
-	P3 p3(13.0, 7.0, 4.0); 
-	P3 p4(10.0, 10.0, 15.0); 
-	P3 p5(7.0, 13.0, 4.0); 
-	P3 p6(13.0, 13.0, 4.0); 
-	P3 p7(0.0, 20.0, 0.0); 
-	P3 p8(20.0, 20.0, 0.0); 
+static MachineParams params;
+static vector<PathXSeries> boundary;
+static vector<PathXSeries> toolpath;
 
-	sx.PushTriangle(p0, p1, p3); 
-	sx.PushTriangle(p0, p3, p2); 
-	sx.PushTriangle(p0, p2, p7); 
-	sx.PushTriangle(p2, p5, p7); 
-	sx.PushTriangle(p1, p8, p3); 
-	sx.PushTriangle(p3, p8, p6); 
-	sx.PushTriangle(p5, p6, p8); 
-	sx.PushTriangle(p5, p8, p7); 
-	sx.PushTriangle(p2, p3, p4); 
-	sx.PushTriangle(p3, p6, p4); 
-	sx.PushTriangle(p6, p5, p4); 
-	sx.PushTriangle(p2, p4, p5); 
+static void MakeRectBoundary(SurfX &sx, vector<PathXSeries> &b) 
+{
+	b.push_back(PathXSeries());
+	b.back().z = sx.gzrg.hi + 1.0;
+	b.back().Add(P2(sx.gxrg.lo, sx.gyrg.lo)); 
+	b.back().Add(P2(sx.gxrg.hi, sx.gyrg.lo)); 
+	b.back().Add(P2(sx.gxrg.hi, sx.gyrg.hi)); 
+	b.back().Add(P2(sx.gxrg.lo, sx.gyrg.hi)); 
+	b.back().Add(P2(sx.gxrg.lo, sx.gyrg.lo)); 
+	b.back().Break(); 
 }
 
-
-static void MakeRectBoundary(SurfX &sx, vector<PathXSeries> &boundary_ftpaths) 
+static int make_roughing(const char* filepath)
 {
-	boundary_ftpaths.push_back(PathXSeries());
-	boundary_ftpaths.back().z = sx.gzrg.hi + 1.0;
-	boundary_ftpaths.back().Add(P2(sx.gxrg.lo, sx.gyrg.lo)); 
-	boundary_ftpaths.back().Add(P2(sx.gxrg.hi, sx.gyrg.lo)); 
-	boundary_ftpaths.back().Add(P2(sx.gxrg.hi, sx.gyrg.hi)); 
-	boundary_ftpaths.back().Add(P2(sx.gxrg.lo, sx.gyrg.hi)); 
-	boundary_ftpaths.back().Add(P2(sx.gxrg.lo, sx.gyrg.lo)); 
-	boundary_ftpaths.back().Break(); 
-}
+	// clear the toolpath
+	toolpath.clear();
 
-static vector<PathXSeries> toolpath_ftpaths;
+	// define the surface
+	SurfX sx;
+	sx.ReadStlFile(filepath);
+	if(params.minz > sx.gzrg.lo)sx.gzrg.lo = params.minz;
+	sx.BuildComponents(); // compress thing 
 
-static int test_roughing(const char* filepath = NULL)
-{
-	double cr = 3.0; // corner radius
-	double fr = 0.0; // flat radius
-	double sd = 5.0;// step down
-
-	// unused for now
-        //double si = cr / 2.0;// step in
-
-	//if (RunCoreRoughDlg(cr, fr, sd, si))
+	// make a rectangle boundary
+	if(boundary.size() == 0)
 	{
-		MachineParams params;
-	// linking parameters
-		params.leadoffdz = 0.1; 
-		params.leadofflen = 1.1;
-		params.leadoffrad = 2.0;
-		params.retractzheight = /*gstsurf->zrg.hi*/ 15.0 + 5.0;
-		params.leadoffsamplestep = 0.6;
-
-	// cutting parameters
-		params.toolcornerrad = cr;
-		params.toolflatrad = fr;
-		params.samplestep = 0.4;
-		params.stepdown = sd;
-		params.clearcuspheight = sd / 3.0;
-
-	// weave parameters
-		params.triangleweaveres = 0.51;
-		params.flatradweaveres = 0.71;
-
-	// stearing parameters
-	// fixed values controlling the step-forward of the tool and 
-	// changes of direction.  
-		params.dchangright = 0.17; 
-		params.dchangrightoncontour = 0.37; 
-		params.dchangleft = -0.41; 
-		params.dchangefreespace = -0.6; 
-		params.sidecutdisplch = 0.0;
-		params.fcut = 1000;
-		params.fretract = 5000;
-		params.thintol = 0.0001;
-
-		// clear the toolpath
-		toolpath_ftpaths.clear();
-
-		// define the surface
-		SurfX sx;
-		if(filepath)
-		{
-			sx.ReadStlFile(filepath);
-		}
-		else
-		{
-			PushTestTrianglesIntoSurface(sx);
-		}
-
-		sx.BuildComponents(); // compress thing 
-
-		// make a rectangle boundary
-		vector<PathXSeries> boundary_ftpaths;
-		MakeRectBoundary(sx, boundary_ftpaths);
-
-		// make the roughing toolpath
-		MakeCorerough(toolpath_ftpaths, sx, boundary_ftpaths[0], params);
+		MakeRectBoundary(sx, boundary);
 	}
 
+	// make the roughing toolpath
+	MakeCorerough(toolpath, sx, boundary[0], params);
+
 	return 0; // success
-}
-
-static PyObject* actp_test(PyObject* self, PyObject* args)
-{
-	int result = test_roughing();
-
-	// return int result
-	PyObject *pValue = PyInt_FromLong(result);
-	Py_INCREF(pValue);
-	return pValue;
 }
 
 static PyObject* actp_makerough(PyObject* self, PyObject* args)
@@ -164,7 +83,7 @@ static PyObject* actp_makerough(PyObject* self, PyObject* args)
 	char* filepath;
 	if (!PyArg_ParseTuple(args, "s", &filepath)) return NULL;
 
-	int result = test_roughing(filepath);
+	int result = make_roughing(filepath);
 
 	// return int result
 	PyObject *pValue = PyInt_FromLong(result);
@@ -174,7 +93,7 @@ static PyObject* actp_makerough(PyObject* self, PyObject* args)
 
 static PyObject* actp_getnumpaths(PyObject* self, PyObject* args)
 {
-	PyObject *pValue = PyInt_FromLong(toolpath_ftpaths.size());
+	PyObject *pValue = PyInt_FromLong(toolpath.size());
 	Py_INCREF(pValue);
 	return pValue;
 }
@@ -184,7 +103,7 @@ static PyObject* actp_getnumpoints(PyObject* self, PyObject* args)
 	int path_index;
 	if (!PyArg_ParseTuple(args, "i", &path_index)) return NULL;
 
-	PathXSeries& path = toolpath_ftpaths[path_index];
+	PathXSeries& path = toolpath[path_index];
 
 	PyObject *pValue = PyInt_FromLong(path.pths.size());
 	Py_INCREF(pValue);
@@ -196,7 +115,7 @@ static PyObject* actp_getz(PyObject* self, PyObject* args)
 	int path_index;
 	if (!PyArg_ParseTuple(args, "i", &path_index)) return NULL;
 
-	PathXSeries& path = toolpath_ftpaths[path_index];
+	PathXSeries& path = toolpath[path_index];
 
 	PyObject *pValue = PyFloat_FromDouble(path.z);
 	Py_INCREF(pValue);
@@ -208,7 +127,7 @@ static PyObject* actp_getpoint(PyObject* self, PyObject* args)
 	int path_index, point_index;
 	if (!PyArg_ParseTuple(args, "ii", &path_index, &point_index)) return NULL;
 
-	PathXSeries& path = toolpath_ftpaths[path_index];
+	PathXSeries& path = toolpath[path_index];
 	P2& point = path.pths[point_index];
 
 
@@ -238,7 +157,7 @@ static PyObject* actp_getnumbreaks(PyObject* self, PyObject* args)
 	int path_index;
 	if (!PyArg_ParseTuple(args, "i", &path_index)) return NULL;
 
-	PathXSeries& path = toolpath_ftpaths[path_index];
+	PathXSeries& path = toolpath[path_index];
 
 	PyObject *pValue = PyInt_FromLong(path.brks.size());
 	Py_INCREF(pValue);
@@ -250,7 +169,7 @@ static PyObject* actp_getbreak(PyObject* self, PyObject* args)
 	int path_index, break_index;
 	if (!PyArg_ParseTuple(args, "ii", &path_index, &break_index)) return NULL;
 
-	PathXSeries& path = toolpath_ftpaths[path_index];
+	PathXSeries& path = toolpath[path_index];
 	int brk = path.brks[break_index];
 
 	PyObject *pValue = PyInt_FromLong(brk);
@@ -263,7 +182,7 @@ static PyObject* actp_getnumlinkpths(PyObject* self, PyObject* args)
 	int path_index;
 	if (!PyArg_ParseTuple(args, "i", &path_index)) return NULL;
 
-	PathXSeries& path = toolpath_ftpaths[path_index];
+	PathXSeries& path = toolpath[path_index];
 
 	PyObject *pValue = PyInt_FromLong(path.linkpths.size());
 	Py_INCREF(pValue);
@@ -275,7 +194,7 @@ static PyObject* actp_getnumlinkpoints(PyObject* self, PyObject* args)
 	int path_index, link_index;
 	if (!PyArg_ParseTuple(args, "ii", &path_index, &link_index)) return NULL;
 
-	PathXSeries& path = toolpath_ftpaths[path_index];
+	PathXSeries& path = toolpath[path_index];
 	vector<P3> &link_path = path.linkpths[link_index];
 
 	PyObject *pValue = PyInt_FromLong(link_path.size());
@@ -288,7 +207,7 @@ static PyObject* actp_getlinkpoint(PyObject* self, PyObject* args)
 	int path_index, link_index, point_index;
 	if (!PyArg_ParseTuple(args, "iii", &path_index, &link_index, &point_index)) return NULL;
 
-	PathXSeries& path = toolpath_ftpaths[path_index];
+	PathXSeries& path = toolpath[path_index];
 	vector<P3> &link_path = path.linkpths[link_index];
 	P3 &point = link_path[point_index];
 
@@ -320,8 +239,244 @@ static PyObject* actp_getlinkpoint(PyObject* self, PyObject* args)
 	return pTuple;
 }
 
+static PyObject* actp_setleadoffdz(PyObject* self, PyObject* args)
+{
+	double d;
+	if (!PyArg_ParseTuple(args, "d", &d)) return NULL;
+	params.leadoffdz = d;
+
+	Py_RETURN_NONE;
+}
+
+static PyObject* actp_setleadofflen(PyObject* self, PyObject* args)
+{
+	double d;
+	if (!PyArg_ParseTuple(args, "d", &d)) return NULL;
+	params.leadofflen = d;
+
+	Py_RETURN_NONE;
+}
+
+static PyObject* actp_setleadoffrad(PyObject* self, PyObject* args)
+{
+	double d;
+	if (!PyArg_ParseTuple(args, "d", &d)) return NULL;
+	params.leadoffrad = d;
+
+	Py_RETURN_NONE;
+}
+
+static PyObject* actp_setretractzheight(PyObject* self, PyObject* args)
+{
+	double d;
+	if (!PyArg_ParseTuple(args, "d", &d)) return NULL;
+	params.retractzheight = d;
+
+	Py_RETURN_NONE;
+}
+
+static PyObject* actp_setleadoffsamplestep(PyObject* self, PyObject* args)
+{
+	double d;
+	if (!PyArg_ParseTuple(args, "d", &d)) return NULL;
+	params.leadoffsamplestep = d;
+
+	Py_RETURN_NONE;
+}
+
+static PyObject* actp_settoolcornerrad(PyObject* self, PyObject* args)
+{
+	double d;
+	if (!PyArg_ParseTuple(args, "d", &d)) return NULL;
+	params.toolcornerrad = d;
+
+	Py_RETURN_NONE;
+}
+
+static PyObject* actp_settoolflatrad(PyObject* self, PyObject* args)
+{
+	double d;
+	if (!PyArg_ParseTuple(args, "d", &d)) return NULL;
+	params.toolflatrad = d;
+
+	Py_RETURN_NONE;
+}
+
+static PyObject* actp_setsamplestep(PyObject* self, PyObject* args)
+{
+	double d;
+	if (!PyArg_ParseTuple(args, "d", &d)) return NULL;
+	params.samplestep = d;
+
+	Py_RETURN_NONE;
+}
+
+static PyObject* actp_setstepdown(PyObject* self, PyObject* args)
+{
+	double d;
+	if (!PyArg_ParseTuple(args, "d", &d)) return NULL;
+	params.stepdown = d;
+
+	Py_RETURN_NONE;
+}
+
+static PyObject* actp_setclearcuspheight(PyObject* self, PyObject* args)
+{
+	double d;
+	if (!PyArg_ParseTuple(args, "d", &d)) return NULL;
+	params.clearcuspheight = d;
+
+	Py_RETURN_NONE;
+}
+
+static PyObject* actp_settriangleweaveres(PyObject* self, PyObject* args)
+{
+	double d;
+	if (!PyArg_ParseTuple(args, "d", &d)) return NULL;
+	params.triangleweaveres = d;
+
+	Py_RETURN_NONE;
+}
+
+static PyObject* actp_setflatradweaveres(PyObject* self, PyObject* args)
+{
+	double d;
+	if (!PyArg_ParseTuple(args, "d", &d)) return NULL;
+	params.flatradweaveres = d;
+
+	Py_RETURN_NONE;
+}
+
+static PyObject* actp_setdchangright(PyObject* self, PyObject* args)
+{
+	double d;
+	if (!PyArg_ParseTuple(args, "d", &d)) return NULL;
+	params.dchangright = d;
+
+	Py_RETURN_NONE;
+}
+
+static PyObject* actp_setdchangrightoncontour(PyObject* self, PyObject* args)
+{
+	double d;
+	if (!PyArg_ParseTuple(args, "d", &d)) return NULL;
+	params.dchangrightoncontour = d;
+
+	Py_RETURN_NONE;
+}
+
+static PyObject* actp_setdchangleft(PyObject* self, PyObject* args)
+{
+	double d;
+	if (!PyArg_ParseTuple(args, "d", &d)) return NULL;
+	params.dchangleft = d;
+
+	Py_RETURN_NONE;
+}
+
+static PyObject* actp_setdchangefreespace(PyObject* self, PyObject* args)
+{
+	double d;
+	if (!PyArg_ParseTuple(args, "d", &d)) return NULL;
+	params.dchangefreespace = d;
+
+	Py_RETURN_NONE;
+}
+
+static PyObject* actp_setsidecutdisplch(PyObject* self, PyObject* args)
+{
+	double d;
+	if (!PyArg_ParseTuple(args, "d", &d)) return NULL;
+	params.sidecutdisplch = d;
+
+	Py_RETURN_NONE;
+}
+
+static PyObject* actp_setfcut(PyObject* self, PyObject* args)
+{
+	int i;
+	if (!PyArg_ParseTuple(args, "i", &i)) return NULL;
+	params.fcut = i;
+
+	Py_RETURN_NONE;
+}
+
+static PyObject* actp_setfretract(PyObject* self, PyObject* args)
+{
+	int i;
+	if (!PyArg_ParseTuple(args, "i", &i)) return NULL;
+	params.fretract = i;
+
+	Py_RETURN_NONE;
+}
+
+static PyObject* actp_setthintol(PyObject* self, PyObject* args)
+{
+	double d;
+	if (!PyArg_ParseTuple(args, "d", &d)) return NULL;
+	params.thintol = d;
+
+	Py_RETURN_NONE;
+}
+
+static PyObject* actp_setstartpoint(PyObject* self, PyObject* args)
+{
+	double x, y, vx, vy;
+	if (!PyArg_ParseTuple(args, "dddd", &x, &y, &vx, &vy)) return NULL;
+	params.use_given_start_point = true;
+	params.start_point = P2(x, y);
+	P2 v(vx, vy);
+	if(v.Len() < 0.000000001)v = P2(1.0, 0.0);
+	params.start_direction = v / v.Len(); 
+
+	Py_RETURN_NONE;
+}
+
+static PyObject* actp_setminz(PyObject* self, PyObject* args)
+{
+	double d;
+	if (!PyArg_ParseTuple(args, "d", &d)) return NULL;
+	params.minz = d;
+
+	Py_RETURN_NONE;
+}
+
+static PyObject* actp_boundaryclear(PyObject* self, PyObject* args)
+{
+	double d = 0.0;
+	PyArg_ParseTuple(args, "d", &d);
+	boundary.clear();
+	boundary.push_back(PathXSeries());
+	boundary.back().z = d;
+
+	Py_RETURN_NONE;
+}
+
+static PyObject* actp_boundaryadd(PyObject* self, PyObject* args)
+{
+	double x, y;
+	if (!PyArg_ParseTuple(args, "dd", &x, &y)) return NULL;
+	boundary.back().Add(P2(x, y)); 
+
+	Py_RETURN_NONE;
+}
+
+static PyObject* actp_boundarybreak(PyObject* self, PyObject* args)
+{
+	// i'm not sure yet if you need one of these at the end of every boundary
+	boundary.back().Break(); 
+	Py_RETURN_NONE;
+}
+
+static PyObject* actp_resetparams(PyObject* self, PyObject* args)
+{
+	// reset all the parameters to their default values
+	params = MachineParams();
+
+	Py_RETURN_NONE;
+}
+
 static PyMethodDef ActpMethods[] = {
-	{"test", actp_test, METH_VARARGS , ""},
 	{"makerough", actp_makerough, METH_VARARGS , ""},
 	{"getnumpaths", actp_getnumpaths, METH_VARARGS , ""},
 	{"getnumpoints", actp_getnumpoints, METH_VARARGS , ""},
@@ -332,6 +487,32 @@ static PyMethodDef ActpMethods[] = {
 	{"getnumlinkpths", actp_getnumlinkpths, METH_VARARGS , ""},
 	{"getnumlinkpoints", actp_getnumlinkpoints, METH_VARARGS , ""},
 	{"getlinkpoint", actp_getlinkpoint, METH_VARARGS , ""},
+	{"setleadoffdz", actp_setleadoffdz, METH_VARARGS , ""},
+	{"setleadofflen", actp_setleadofflen, METH_VARARGS , ""},
+	{"setleadoffrad", actp_setleadoffrad, METH_VARARGS , ""},
+	{"setretractzheight", actp_setretractzheight, METH_VARARGS , ""},
+	{"setleadoffsamplestep", actp_setleadoffsamplestep, METH_VARARGS , ""},
+	{"settoolcornerrad", actp_settoolcornerrad, METH_VARARGS , ""},
+	{"settoolflatrad", actp_settoolflatrad, METH_VARARGS , ""},
+	{"setsamplestep", actp_setsamplestep, METH_VARARGS , ""},
+	{"setstepdown", actp_setstepdown, METH_VARARGS , ""},
+	{"setclearcuspheight", actp_setclearcuspheight, METH_VARARGS , ""},
+	{"settriangleweaveres", actp_settriangleweaveres, METH_VARARGS , ""},
+	{"setflatradweaveres", actp_setflatradweaveres, METH_VARARGS , ""},
+	{"setdchangright", actp_setdchangright, METH_VARARGS , ""}, 
+	{"setdchangrightoncontour", actp_setdchangrightoncontour, METH_VARARGS , ""},
+	{"setdchangleft", actp_setdchangleft, METH_VARARGS , ""},
+	{"setdchangefreespace", actp_setdchangefreespace, METH_VARARGS , ""},
+	{"setsidecutdisplch", actp_setsidecutdisplch, METH_VARARGS , ""},
+	/*int*/{"setfcut", actp_setfcut, METH_VARARGS , ""},
+	/*int*/{"setfretract", actp_setfretract, METH_VARARGS , ""},
+	{"setthintol", actp_setthintol, METH_VARARGS , ""},
+	{"setstartpoint", actp_setstartpoint, METH_VARARGS , ""},
+	{"setminz", actp_setminz, METH_VARARGS , ""},
+	{"boundaryclear", actp_boundaryclear, METH_VARARGS , ""},
+	{"boundaryadd", actp_boundaryadd, METH_VARARGS , ""},
+	{"boundarybreak", actp_boundarybreak, METH_VARARGS , ""},
+	{"resetdefaults", actp_resetparams, METH_VARARGS , ""},
 	{NULL, NULL, 0, NULL}
 };
 

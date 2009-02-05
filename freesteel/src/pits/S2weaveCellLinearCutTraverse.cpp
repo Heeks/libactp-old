@@ -129,7 +129,7 @@ bool S2weaveCellLinearCutTraverse::SetCellCutContinue(const P2& lvbearing)
 			#ifdef MDEBUG
 			if (!bOnBoundF) 
 			{
-				for (int libb = 0; libb < bolistcrossings.size(); libb++) 
+				for (int libb = 0; libb < (int)(bolistcrossings.size()); libb++) 
 					ASSERT(ib != bolistcrossings[libb].first); 
 			}
 			#endif
@@ -144,7 +144,7 @@ bool S2weaveCellLinearCutTraverse::SetCellCutContinue(const P2& lvbearing)
 			for (; libb < (int)(bolistcrossings.size()); libb++) 
 				if (ib == bolistcrossings[libb].first) 
 					break; 
-			ASSERT(libb < bolistcrossings.size()); 
+			ASSERT(libb < (int)(bolistcrossings.size())); 
 			#ifdef MDEBUG
 			pair<int, int> ccrD = bolistpairs[bolistcrossings[libb].first];  
 			TOL_ZERO((Along(lambb, GetBoundPoint(ccrD.first), GetBoundPoint(ccrD.second)) - ptcpbb).Len()); 
@@ -294,14 +294,14 @@ void S2weaveCellLinearCutTraverse::AdvanceAlongContourAcrossCell()
 	for (ibl = 0; ibl < (int)(boundlist.size()); ibl++) 
 		if (boundlist[ibl].second == blcp) 
 			break; 
-	ASSERT(ibl < boundlist.size()); 
+	ASSERT(ibl < (int)(boundlist.size())); 
 	ASSERT(boundlist[ibl].first == ((sicc + 2) & 3)); 
 
 	// find the pair which leads on from this point 
 	for (ib = 0; ib < (int)(bolistpairs.size()); ib++) 
 		if (bolistpairs[ib].first == ibl) 
 			break; 
-	ASSERT(ib < bolistpairs.size()); 
+	ASSERT(ib < (int)(bolistpairs.size())); 
 
 	ASSERT(ptcpbb == GetBoundPoint(bolistpairs[ib].first)); 
 	// iblb will be set properly on the peeling off.  
@@ -338,8 +338,10 @@ bool S2weaveCellLinearCutTraverse::OnContourFollowBearing(double dch, double fol
 	}
 	else
 	{
-		// double res = (1.0 - lambb) * clen;  // unused variable
+#ifdef MDEBUG
+		double res = (1.0 - lambb) * clen;  // unused variable
 		ASSERT(res <= folldist); 
+#endif
 
 		// we will cross this cell boundary.  Mark it if it's entirely cleared from the start.  
 		if (bContouribfvisited) 

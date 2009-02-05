@@ -22,44 +22,51 @@
 #ifndef COREROUGHGENERATION_H
 #define COREROUGHGENERATION_H
 
+#include "bolts/bolts.h"
+#include "cages/cages.h"
+#include "pits/pits.h"
 
 //////////////////////////////////////////////////////////////////////
 struct MachineParams
 {
+	// start point
+	bool use_given_start_point;
+	P2 start_point;
+	P2 start_direction;
+	double minz;
+
 	// linking parameters
-		double leadoffdz; 
-		double leadofflen;
-		double leadoffrad;
-		double retractzheight;
-		double leadoffsamplestep;
+	double leadoffdz; 
+	double leadofflen;
+	double leadoffrad;
+	double retractzheight;
+	double leadoffsamplestep;
 
 	// cutting parameters
-		double toolcornerrad;
-		double toolflatrad;
-		double samplestep;
-		double stepdown;
-		double clearcuspheight;
+	double toolcornerrad;
+	double toolflatrad;
+	double samplestep;
+	double stepdown;
+	double clearcuspheight;
 
 	// weave parameters
-		double triangleweaveres;
-		double flatradweaveres;
+	double triangleweaveres;
+	double flatradweaveres;
 
 	// steering parameters
-		double dchangright; 
-		double dchangrightoncontour;
-		double dchangleft;
+	double dchangright; 
+	double dchangrightoncontour;
+	double dchangleft;
 
-		double dchangefreespace;
-		double sidecutdisplch;
+	double dchangefreespace;
+	double sidecutdisplch;
 
 	// post processing
-		int fcut;
-		int fretract;
-		double thintol;
+	int fcut;
+	int fretract;
+	double thintol;
 
-
-
-
+	MachineParams(); // default values
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -92,7 +99,7 @@ public:
 	CoreRoughGeneration(PathXSeries* px, const I1& lxrg, const I1& lyrg); 
 
 	
-	void FindGoStart(); 
+	void FindGoStart(const MachineParams& params); 
 
 	bool RestartAtBCI(BCellIndex& bci, const MachineParams& params, bool bConnectAtStart); 
 	double ChangeBearing(const P2& pt, const P2& tvec, const MachineParams& params); 
@@ -102,5 +109,7 @@ public:
 
   void setWeave(S2weave* weave) { wc.ps2w = weave; }
 }; 
+
+void MakeCorerough(std::vector<PathXSeries>& vpathseries, SurfX& sx, const PathXSeries& bound, const MachineParams& params);
 
 #endif

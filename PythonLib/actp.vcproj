@@ -283,6 +283,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\freesteel\src\pits\CoreRoughGeneration.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\freesteel\src\pits\CoreRoughGeneration.h"
 				>
 			</File>
@@ -335,14 +339,6 @@
 				>
 			</File>
 		</Filter>
-		<File
-			RelativePath=".\MakeToolpath.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\MakeToolpath.h"
-			>
-		</File>
 		<File
 			RelativePath=".\PythonStuff.cpp"
 			>

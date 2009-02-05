@@ -505,7 +505,7 @@ void CircCrossingStructure::HackToolRectangle(const P2& p0, const P2& p1)
 	// show it is out of order only once (it is properly clockwise) 
 	#ifdef MDEBUG
 		bool bOrder = false; 
-		for (int ii = 1; ii < cpara.size(); ii++) 
+		for (int ii = 1; ii < (int)cpara.size(); ii++) 
 		{
 			if (cpara[ii - 1].darg > cpara[ii].darg) 
 			{

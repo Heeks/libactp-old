@@ -1,6 +1,6 @@
 CCFLAGS=-Wall -fPIC -g -I/usr/include/python2.5 -I./ -I../freesteel/src
 
-OBJECTS=Partition1.o S1.o PathX.o PathXboxed.o S1stockcircle.o S2weave.o SurfX.o SurfXboxed.o NormRay_gen.o S2weaveCell.o S2weaveCellLinearCut.o S2weaveCellLinearCutTraverse.o S2weaveCircle.o SLi_gen.o SurfXbuildcomponents.o SurfXSliceRay.o PythonStuff.o MakeToolpath.o
+OBJECTS=Partition1.o S1.o PathX.o PathXboxed.o S1stockcircle.o S2weave.o SurfX.o SurfXboxed.o NormRay_gen.o CoreRoughGeneration.o S2weaveCell.o S2weaveCellLinearCut.o S2weaveCellLinearCutTraverse.o S2weaveCircle.o SLi_gen.o SurfXbuildcomponents.o SurfXSliceRay.o PythonStuff.o
 
 SHARED_LIBRARY=./actp.so
 
@@ -32,6 +32,9 @@ SurfXboxed.o: ../freesteel/src/cages/SurfXboxed.cpp
 	gcc -c $? ${CCFLAGS} -o $@
 
 NormRay_gen.o: ../freesteel/src/pits/NormRay_gen.cpp
+	gcc -c $? ${CCFLAGS} -o $@
+
+CoreRoughGeneration.o: ../freesteel/src/pits/CoreRoughGeneration.cpp
 	gcc -c $? ${CCFLAGS} -o $@
 
 S2weaveCell.o: ../freesteel/src/pits/S2weaveCell.cpp

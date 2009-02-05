@@ -26,8 +26,8 @@
 //////////////////////////////////////////////////////////////////////
 int FindCellParal(const vector<S1>& wfibs, double lw) 
 {
-	unsigned int res; 
-	for (res = 1; res < wfibs.size(); res++) 
+	int res; 
+	for (res = 1; res < (int)(wfibs.size()); res++) 
 		if (wfibs[res].wp > lw) 
 			break; 
 	ASSERT((wfibs[res - 1].wp <= lw) && (wfibs[res].wp > lw)); 
@@ -93,10 +93,10 @@ const S1* S2weaveCell::GetSide(int icn) const
 // for now we assume it's all a regular grid.  
 void S2weaveCell::AdvanceCrossSide(int icn, const P2& cspt)  
 {
-	//double wvval = ((icn & 1) == 0 ? cspt.v : cspt.u); // unused variable
-	#ifdef MDEBUG
-		double mvval = ((icn & 1) != 0 ? cspt.v : cspt.u); 
-	#endif
+	double wvval = ((icn & 1) == 0 ? cspt.v : cspt.u); // unused variable
+#ifdef MDEBUG
+	double mvval = ((icn & 1) != 0 ? cspt.v : cspt.u); 
+#endif
 
 	if (icn == 0) 
 	{
@@ -108,7 +108,7 @@ void S2weaveCell::AdvanceCrossSide(int icn, const P2& cspt)
 	else if (icn == 2) 
 	{
 		iu++; 
-		ASSERT(iu < ps2w->ufibs.size());
+		ASSERT(iu < (int)(ps2w->ufibs.size()));
 		ASSERT(mvval == clurg.hi); 
 		ASSERT(clvrg.Contains(wvval)); 
 	}
@@ -122,7 +122,7 @@ void S2weaveCell::AdvanceCrossSide(int icn, const P2& cspt)
 	else if (icn == 1) 
 	{
 		iv++; 
-		ASSERT(iv < ps2w->vfibs.size());
+		ASSERT(iv < (int)(ps2w->vfibs.size()));
 		ASSERT(mvval == clvrg.hi); 
 		ASSERT(clurg.Contains(wvval)); 
 	}
@@ -143,14 +143,14 @@ int S2weaveCell::GetBoundListPosition(int sic, const P2& ptb, bool bOnBoundOutsi
 {
 	if (boundlist.empty()) 
 		return -1; 
-	unsigned int res = 0; 
+	int res = 0; 
 	bool bgoingup = ((sic & 2) == 0); 
 	bool binV = ((sic & 1) == 0); 
 
 	double wb = (binV ? ptb.v : ptb.u); 
 	ASSERT(GetSide(sic)->wp == (binV ? ptb.u : ptb.v)); 
 
-	for ( ; res < boundlist.size(); res++) 
+	for ( ; res < (int)(boundlist.size()); res++) 
 	{
 		if (boundlist[res].first == sic)
 		{
@@ -265,7 +265,7 @@ int S2weaveCell::CreateBoundList()
 	// (not as likely if there has been a flat-rad offset where the region will always have some radius, but the spaces may be narrow).  
 	DEBUG_ONLY(bool binD = bLDin); 
 	int ib = boundlist.size() - 1; 
-	for (unsigned int ibl = 0; ibl < boundlist.size(); ibl++) 
+	for (int ibl = 0; ibl < (int)(boundlist.size()); ibl++) 
 	{
 		ASSERT(binD == !GetBoundLower(ibl)); 
 		if (GetBoundLower(ibl)) 
