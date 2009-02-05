@@ -1,6 +1,8 @@
 import actp
 fout = open("test.tap", 'wb')
 
+fout.write("G90 G21 G17\n")
+
 actp.makerough('cone.stl')
 
 npaths = actp.getnumpaths()
@@ -27,3 +29,6 @@ for path in range(0, npaths):
             x, y, z = actp.getlinkpoint(path, brk, linkpoint)
             #rapid(x, y, z)
             fout.write("G0 X" + str(x) + " Y" + str(y) + " Z" + str(z) + "\n")
+
+fout.write("M2\n")
+
