@@ -29,16 +29,16 @@ for path in range(0, npaths):
             x, y = actp.getpoint(path, point)
             #feed(x, y, z)
             if first_z_done == False:
-                fout.write("G0 X" + str(x) + " Y" + str(y) + " Z" + str(z) + "\n")
+                fout.write("G0 X" + str(' %.4f' % x) + " Y " + str(' %.4f' %y) + " Z " + str(' %.4f' %z) + "\n")
                 first_z_done = True
             else:
-                fout.write("G1 X" + str(x) + " Y" + str(y) + "\n")
+                fout.write("G1 X" + str(' %.4f' % x) + " Y " + str(' %.4f' %y) + "\n")
         start_pos = brkpos
         nlinkpoints = actp.getnumlinkpoints(path, brk)
         for linkpoint in range(0, nlinkpoints):
             x, y, z = actp.getlinkpoint(path, brk, linkpoint)
             #rapid(x, y, z)
-            fout.write("G0 X" + str(x) + " Y" + str(y) + " Z" + str(z) + "\n")
+            fout.write("G0 X" + str(' %.4f' % x) + " Y " + str(' %.4f' %y) + " Z " + str(' %.4f' %z) + "\n")
 
 fout.write("M2\n")
 
