@@ -1,3 +1,6 @@
+# Makefile
+# written by Dan Heeks, January 2009, license: GPL version 3 http://www.gnu.org/licenses/gpl-3.0.txt
+
 CCFLAGS=-Wall -fPIC -g -I/usr/include/python2.5 -I./ -I../freesteel/src
 
 OBJECTS=Partition1.o S1.o PathX.o PathXboxed.o S1stockcircle.o S2weave.o SurfX.o SurfXboxed.o NormRay_gen.o CoreRoughGeneration.o S2weaveCell.o S2weaveCellLinearCut.o S2weaveCellLinearCutTraverse.o S2weaveCircle.o SLi_gen.o SurfXbuildcomponents.o SurfXSliceRay.o PythonStuff.o

@@ -1,5 +1,7 @@
 // PythonStuff.cpp
 
+// written by Dan Heeks, January 2009, license: GPL version 3 http://www.gnu.org/licenses/gpl-3.0.txt
+
 #ifdef WIN32
 #include "windows.h"
 #endif
