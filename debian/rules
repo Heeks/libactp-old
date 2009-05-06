@@ -53,8 +53,7 @@ install: build
 	dh_installdirs
 
 	# Add here commands to install the package into debian/tmp
-#	$(MAKE) DESTDIR=$(CURDIR)/debian/tmp install
-	$(MAKE) -C PythonLib PREFIX=$(CURDIR)/debian/libactp0/usr install
+	$(MAKE) -C PythonLib PREFIX=/usr DESTDIR=$(CURDIR)/debian/libactp0 install
 
 
 # Build architecture-independent files here.
