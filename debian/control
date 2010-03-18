@@ -10,12 +10,15 @@ Package: python-actp
 Architecture: any
 Depends: ${shlibs:Depends}, ${python:Depends}
 Description: Adaptive Clearing Tool Path Library
- FreeSteel is a program originally written by Julian Todd and Martin Dunschen and released under the GPL.
- It generated an adaptive clearing strategy tool path for screen display.
+ FreeSteel is a program originally written by Julian Todd and Martin
+ Dunschen and released under the GPL.  It generated an adaptive clearing
+ strategy tool path for screen display.
  .
- The libactp (Adaptive Clearing Tool Path Library) is an implementation of the GPL'ed algorithm demonstrated in FreeSteel
- as a set of C library functions. This library can then be wrapped for use in other languages such as Python or Perl. 
+ The libactp (Adaptive Clearing Tool Path Library) is an implementation
+ of the GPL'ed algorithm demonstrated in FreeSteel as a set of C library
+ functions. This library can then be wrapped for use in other languages
+ such as Python or Perl.
  .
- This package contains the shared library.
+ This package contains the Python module.
  .
 
