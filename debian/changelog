@@ -1,3 +1,9 @@
+libactp (0.0.2-svn0) karmic; urgency=low
+
+  * Fix some minor debian package issues.
+
+ -- Sebastian Kuzminsky <seb@highlab.com>  Thu, 18 Mar 2010 10:11:43 -0600
+
 libactp (0.0.1-svn0) unstable; urgency=low
 
   * Initial release
