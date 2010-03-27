@@ -161,7 +161,7 @@ int S2weaveCell::GetBoundListPosition(int sic, const P2& ptb, bool bOnBoundOutsi
 				if (!GetBoundLower(res)) 
 				{
 					res++; 
-					if (res == boundlist.size()) 
+					if (res == (int)boundlist.size()) 
 						res = 0; 
 				}
 				else
@@ -177,7 +177,7 @@ int S2weaveCell::GetBoundListPosition(int sic, const P2& ptb, bool bOnBoundOutsi
 		else if (boundlist[res].first > sic)
 			break; 
 	}
-	if (res == boundlist.size()) 
+	if (res == (int)boundlist.size()) 
 		res = 0; 
 	ASSERT(!bOnBoundOutside); 
 	return res; 
