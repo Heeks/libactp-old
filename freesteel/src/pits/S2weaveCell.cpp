@@ -93,8 +93,8 @@ const S1* S2weaveCell::GetSide(int icn) const
 // for now we assume it's all a regular grid.  
 void S2weaveCell::AdvanceCrossSide(int icn, const P2& cspt)  
 {
-	double wvval = ((icn & 1) == 0 ? cspt.v : cspt.u); // unused variable
 #ifdef MDEBUG
+	double wvval = ((icn & 1) == 0 ? cspt.v : cspt.u);
 	double mvval = ((icn & 1) != 0 ? cspt.v : cspt.u); 
 #endif
 
